@@ -1,0 +1,172 @@
+
+{% extends 'base.html' %}
+
+{% block title %}My Cart | BanniThinonna{% endblock %}
+
+{% block content %}
+
+<style>
+.cart-page {
+    max-width: 1100px;
+    margin: 50px auto;
+    padding: 20px;
+    min-height: 55vh;
+}
+
+.cart-heading {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.cart-heading h1 {
+    font-size: 36px;
+    color: #5b3025;
+}
+
+.cart-heading p {
+    color: #777;
+    margin-top: 8px;
+}
+
+.cart-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+.cart-items, .cart-summary {
+    background: #fff;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 55px 15px;
+}
+
+.empty-cart .cart-icon {
+    font-size: 65px;
+}
+
+.empty-cart h2 {
+    color: #5b3025;
+    margin: 15px 0;
+}
+
+.empty-cart p {
+    color: #777;
+    margin-bottom: 25px;
+}
+
+.shop-btn {
+    display: inline-block;
+    background: #8b4935;
+    color: white;
+    padding: 13px 25px;
+    border-radius: 7px;
+    text-decoration: none;
+}
+
+.cart-summary h2 {
+    color: #5b3025;
+    margin-bottom: 22px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 15px 0;
+    color: #666;
+}
+
+.summary-total {
+    border-top: 1px solid #eee;
+    padding-top: 18px;
+    font-size: 19px;
+    font-weight: bold;
+    color: #5b3025;
+}
+
+.checkout-btn {
+    display: block;
+    text-align: center;
+    background: #8b4935;
+    color: white;
+    padding: 13px;
+    border-radius: 7px;
+    text-decoration: none;
+    margin-top: 25px;
+}
+
+@media(max-width: 750px) {
+    .cart-layout {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="cart-page">
+
+    <div class="cart-heading">
+        <h1>My Shopping Cart 🛒</h1>
+        <p>Your favourite bakery treats are just a step away!</p>
+    </div>
+
+    <div class="cart-layout">
+
+        <div class="cart-items">
+
+            {% if cart_items %}
+
+                {% for item in cart_items %}
+                    <div class="cart-product">
+                        <!-- Product details will be connected to Django here -->
+                        {{ item.product.name }}
+                    </div>
+                {% endfor %}
+
+            {% else %}
+
+                <div class="empty-cart">
+                    <div class="cart-icon">🛒</div>
+                    <h2>Your cart is empty!</h2>
+                    <p>Looks like you haven't added any delicious treats yet.</p>
+                    <a href="{% url 'home' %}" class="shop-btn">
+                        Continue Shopping
+                    </a>
+                </div>
+
+            {% endif %}
+
+        </div>
+
+        <div class="cart-summary">
+            <h2>Order Summary</h2>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>₹{{ total }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>Delivery</span>
+                <span>To be calculated</span>
+            </div>
+
+            <div class="summary-row summary-total">
+                <span>Total</span>
+                <span>₹{{ total }}</span>
+            </div>
+
+            <a href="#" class="checkout-btn">
+                Proceed to Checkout
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
