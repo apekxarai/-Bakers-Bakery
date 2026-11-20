@@ -70,6 +70,11 @@
     border-radius: 12px;
     padding: 15px;
     box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+    transition: 0.3s;
+}
+
+.wishlist-card:hover {
+    transform: translateY(-4px);
 }
 
 .wishlist-card img {
@@ -87,6 +92,12 @@
 .wishlist-price {
     color: #8b4935;
     font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.wishlist-weight {
+    color: #777;
+    font-size: 13px;
     margin-bottom: 12px;
 }
 
@@ -108,9 +119,17 @@
     color: white;
 }
 
+.add-cart:hover {
+    background: #70432f;
+}
+
 .remove-item {
     background: #f3e8e5;
     color: #743b2c;
+}
+
+.remove-item:hover {
+    background: #ead4cc;
 }
 
 @media(max-width: 600px) {
@@ -120,6 +139,7 @@
 }
 </style>
 
+
 <div class="wishlist-page">
 
     <div class="wishlist-heading">
@@ -127,55 +147,244 @@
         <p>All the treats you love, saved in one place!</p>
     </div>
 
-    {% if wishlist_items %}
 
-        <div class="wishlist-grid">
+    <!-- WISHLIST PRODUCTS -->
 
-            {% for item in wishlist_items %}
+    <div class="wishlist-grid" id="wishlistGrid"></div>
 
-                <div class="wishlist-card">
 
-                    <img src="{{ item.product.image.url }}"
-                         alt="{{ item.product.name }}">
+    <!-- EMPTY WISHLIST -->
 
-                    <h3>{{ item.product.name }}</h3>
+    <div class="empty-wishlist" id="emptyWishlist" style="display:none;">
 
-                    <p class="wishlist-price">
-                        ₹{{ item.product.price }}
-                    </p>
+        <div class="heart-icon">♡</div>
 
-                    <div class="wishlist-actions">
-                        <button class="add-cart" type="button">
-                            Add to Cart
-                        </button>
+        <h2>Your wishlist is empty!</h2>
 
-                        <button class="remove-item" type="button">
-                            Remove
-                        </button>
-                    </div>
+        <p>Save your favourite cakes, sweets and snacks here.</p>
 
-                </div>
+        <a href="{% url 'sweets' %}" class="shop-btn">
+            Explore Sweets
+        </a>
 
-            {% endfor %}
-
-        </div>
-
-    {% else %}
-
-        <div class="empty-wishlist">
-            <div class="heart-icon">♡</div>
-
-            <h2>Your wishlist is empty!</h2>
-
-            <p>Save your favourite cakes, sweets and snacks here.</p>
-
-            <a href="{% url 'home' %}" class="shop-btn">
-                Explore Products
-            </a>
-        </div>
-
-    {% endif %}
+    </div>
 
 </div>
+
+
+<script>
+
+// GET WISHLIST
+
+function getWishlist() {
+
+    try {
+        return JSON.parse(
+            localStorage.getItem("bakeryWishlist")
+        ) || [];
+    } catch (error) {
+        return [];
+    }
+
+}
+
+
+// SAVE WISHLIST
+
+function saveWishlist(wishlist) {
+
+    localStorage.setItem(
+        "bakeryWishlist",
+        JSON.stringify(wishlist)
+    );
+
+}
+
+
+// DISPLAY WISHLIST
+
+function displayWishlist() {
+
+    let wishlist = getWishlist();
+
+    let grid = document.getElementById("wishlistGrid");
+    let empty = document.getElementById("emptyWishlist");
+
+    grid.innerHTML = "";
+
+    if (wishlist.length === 0) {
+
+        empty.style.display = "block";
+
+    } else {
+
+        empty.style.display = "none";
+
+        wishlist.forEach((item, index) => {
+
+            let card = document.createElement("div");
+            card.className = "wishlist-card";
+
+            let image = document.createElement("img");
+            image.src = item.image || "";
+            image.alt = item.name || "Product";
+
+            image.onerror = function() {
+                this.style.display = "none";
+            };
+
+            let name = document.createElement("h3");
+            name.textContent = item.name || "Product";
+
+            let price = document.createElement("p");
+            price.className = "wishlist-price";
+            price.textContent =
+                "₹" + (Number(item.price) || 0).toFixed(2);
+
+            let weight = document.createElement("p");
+            weight.className = "wishlist-weight";
+
+            let grams = Number(item.weight) || 1000;
+
+            weight.textContent =
+                "Weight: " + (grams >= 1000
+                    ? (grams / 1000) + " kg"
+                    : grams + " g");
+
+            let actions = document.createElement("div");
+            actions.className = "wishlist-actions";
+
+            let addButton = document.createElement("button");
+            addButton.className = "add-cart";
+            addButton.textContent = "Add to Cart";
+            addButton.type = "button";
+            addButton.onclick = () => moveToCart(index);
+
+            let removeButton = document.createElement("button");
+            removeButton.className = "remove-item";
+            removeButton.textContent = "Remove";
+            removeButton.type = "button";
+            removeButton.onclick = () => removeWishlistItem(index);
+
+            actions.append(addButton, removeButton);
+
+            card.append(image, name, price, weight, actions);
+
+            grid.appendChild(card);
+
+        });
+
+    }
+
+    updateHeaderCounts();
+
+}
+
+
+// REMOVE FROM WISHLIST
+
+function removeWishlistItem(index) {
+
+    let wishlist = getWishlist();
+
+    wishlist.splice(index, 1);
+
+    saveWishlist(wishlist);
+
+    displayWishlist();
+
+}
+
+
+// MOVE WISHLIST PRODUCT TO CART
+
+function moveToCart(index) {
+
+    let wishlist = getWishlist();
+
+    let product = wishlist[index];
+
+    if (!product) return;
+
+    let cart = [];
+
+    try {
+        cart = JSON.parse(
+            localStorage.getItem("bakeryCart")
+        ) || [];
+    } catch (error) {
+        cart = [];
+    }
+
+    let existing = cart.find(item =>
+        String(item.id) === String(product.id) &&
+        Number(item.weight || 1000) === Number(product.weight || 1000)
+    );
+
+    if (existing) {
+
+        existing.quantity = (Number(existing.quantity) || 1) + 1;
+
+    } else {
+
+        cart.push({
+            ...product,
+            weight: Number(product.weight) || 1000,
+            quantity: 1
+        });
+
+    }
+
+    localStorage.setItem(
+        "bakeryCart",
+        JSON.stringify(cart)
+    );
+
+    wishlist.splice(index, 1);
+
+    saveWishlist(wishlist);
+
+    displayWishlist();
+
+    alert(product.name + " moved to cart!");
+
+}
+
+
+// HEADER COUNTS
+
+function updateHeaderCounts() {
+
+    let cart = [];
+
+    try {
+        cart = JSON.parse(
+            localStorage.getItem("bakeryCart")
+        ) || [];
+    } catch (error) {
+        cart = [];
+    }
+
+    let cartCount = cart.reduce(
+        (total, item) => total + (Number(item.quantity) || 1), 0
+    );
+
+    let wishlistCount = getWishlist().length;
+
+    let cartElement = document.getElementById("cartCount");
+    let wishlistElement = document.getElementById("wishlistCount");
+
+    if (cartElement) cartElement.textContent = cartCount;
+
+    if (wishlistElement) wishlistElement.textContent = wishlistCount;
+
+}
+
+
+// INITIAL DISPLAY
+
+document.addEventListener("DOMContentLoaded", displayWishlist);
+
+</script>
 
 {% endblock %}
