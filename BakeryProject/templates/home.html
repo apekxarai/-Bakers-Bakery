@@ -1,0 +1,766 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Home | BanniThinonna{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* HERO SECTION */
+
+.hero {
+    min-height: 530px;
+    padding: 70px 8%;
+    background: #f9e9e2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 50px;
+}
+
+.hero-content {
+    flex: 1;
+}
+
+.hero-tag {
+    color: #bd7770;
+    letter-spacing: 3px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.hero h1 {
+    font-family: Georgia, serif;
+    font-size: 58px;
+    line-height: 1.2;
+    color: #70432f;
+    margin-bottom: 20px;
+}
+
+.hero-description {
+    font-size: 16px;
+    color: #80695e;
+    line-height: 1.9;
+    margin-bottom: 30px;
+    max-width: 480px;
+}
+
+.shop-btn {
+    display: inline-block;
+    background: #935b45;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.shop-btn:hover {
+    background: #70432f;
+    transform: translateY(-3px);
+}
+
+.hero-image {
+    flex: 1;
+}
+
+.hero-image img {
+    width: 100%;
+    height: 410px;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+
+/* COMMON SECTION */
+
+.section {
+    padding: 75px 8%;
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.subtitle {
+    color: #bd7770;
+    letter-spacing: 3px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.section-heading h2 {
+    font-family: Georgia, serif;
+    font-size: 36px;
+    color: #70432f;
+    margin-bottom: 12px;
+}
+
+.section-heading p:last-child {
+    color: #927c70;
+}
+
+
+/* CATEGORIES */
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.category-card {
+    height: 330px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #f3e2d7;
+}
+
+.category-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.4s;
+}
+
+.category-card:hover img {
+    transform: scale(1.08);
+}
+
+.category-info {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 25px;
+    color: white;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+}
+
+.category-info h3 {
+    font-family: Georgia, serif;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+
+/* BESTSELLERS */
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.product-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+    transition: 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-7px);
+}
+
+.product-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.product-details {
+    padding: 22px;
+}
+
+.product-details h3 {
+    font-family: Georgia, serif;
+    font-size: 21px;
+    margin-bottom: 10px;
+}
+
+.product-details p {
+    font-size: 14px;
+    color: #927c70;
+    margin-bottom: 12px;
+}
+
+.price {
+    color: #a45f45;
+    font-weight: bold;
+    font-size: 19px;
+}
+
+
+/* OFFER */
+
+.offer {
+    padding: 80px 10%;
+    background: #80523e;
+    color: white;
+    text-align: center;
+}
+
+.offer h2 {
+    font-family: Georgia, serif;
+    font-size: 43px;
+    margin: 20px 0;
+}
+
+.offer p {
+    margin-bottom: 15px;
+}
+
+.offer-btn {
+    display: inline-block;
+    margin-top: 20px;
+    background: white;
+    color: #70432f;
+    padding: 14px 30px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+
+/* WHY CHOOSE US */
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.feature-card {
+    padding: 30px 20px;
+    background: white;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+}
+
+.feature-card .icon {
+    font-size: 38px;
+    margin-bottom: 15px;
+}
+
+.feature-card h3 {
+    font-family: Georgia, serif;
+    margin-bottom: 12px;
+}
+
+.feature-card p {
+    color: #927c70;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+
+/* TESTIMONIAL */
+
+.testimonial {
+    background: #f9eee8;
+    text-align: center;
+}
+
+.review-box {
+    max-width: 650px;
+    background: white;
+    padding: 40px;
+    margin: 30px auto;
+    border-radius: 12px;
+}
+
+.stars {
+    color: #e4a74b;
+    font-size: 25px;
+    margin-bottom: 20px;
+}
+
+.review-box p {
+    color: #80695e;
+    line-height: 1.9;
+    margin-bottom: 20px;
+}
+
+
+/* NEWSLETTER */
+
+.newsletter {
+    padding: 70px 20px;
+    text-align: center;
+}
+
+.newsletter h2 {
+    font-family: Georgia, serif;
+    font-size: 35px;
+    color: #70432f;
+    margin-bottom: 15px;
+}
+
+.newsletter p {
+    color: #927c70;
+    margin-bottom: 25px;
+}
+
+.newsletter form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.newsletter input {
+    width: 320px;
+    padding: 14px;
+    border: 1px solid #dfc9bb;
+    border-radius: 5px;
+    outline: none;
+}
+
+.newsletter button {
+    padding: 14px 25px;
+    background: #935b45;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#newsletterMessage {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+
+/* RESPONSIVE */
+
+@media(max-width: 900px) {
+
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero h1 {
+        font-size: 45px;
+    }
+
+    .hero-description {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .category-grid,
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 550px) {
+
+    .hero h1 {
+        font-size: 36px;
+    }
+
+    .hero-image img {
+        height: 250px;
+    }
+
+    .category-grid,
+    .product-grid,
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .newsletter form {
+        flex-direction: column;
+    }
+
+    .newsletter input {
+        width: 100%;
+    }
+
+    .section-heading h2 {
+        font-size: 28px;
+    }
+
+}
+
+
+/* CATEGORY ARROW BUTTON */
+
+.category-arrow {
+    position: absolute;
+    right: 25px;
+    bottom: 25px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: white;
+    color: #8b4935;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 27px;
+    text-decoration: none;
+    transition: 0.3s;
+    z-index: 2;
+}
+
+.category-arrow:hover {
+    background: #8b4935;
+    color: white;
+    transform: translateX(5px);
+}
+
+
+</style>
+
+
+<!-- HERO SECTION -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <p class="hero-tag">
+            FRESHLY BAKED EVERY DAY
+        </p>
+
+        <h1>
+            A Little Sweetness<br>
+            Goes a Long Way.
+        </h1>
+
+        <p class="hero-description">
+            Discover delicious sweets, freshly baked cakes
+            and crispy namkeens, all made with love
+            and the finest ingredients.
+        </p>
+
+        <a href="#categories" class="shop-btn">
+            Explore Our Collection →
+        </a>
+
+    </div>
+
+    <div class="hero-image">
+
+        <img
+        src="https://i.pinimg.com/1200x/10/f4/b5/10f4b544a06e0ac53ee4f46236bd56ac.jpg"
+        alt="Bakery">
+
+    </div>
+
+</section>
+
+
+<!-- CATEGORIES SECTION -->
+
+<!-- CATEGORIES SECTION -->
+
+<section class="section" id="categories">
+
+    <div class="section-heading">
+        <h2>Explore Our Categories</h2>
+        <p>Discover something delicious for every craving.</p>
+    </div>
+
+    <div class="category-grid">
+
+        <!-- SWEETS -->
+        <div class="category-card">
+
+            <img
+                src="PASTE_YOUR_ORIGINAL_SWEETS_IMAGE_URL"
+                alt="Sweets"
+            >
+
+            <div class="category-info">
+
+                <h3>Sweets</h3>
+
+                <p>Traditional sweetness in every bite.</p>
+
+                <a href="{% url 'sweets' %}"
+                   class="category-arrow"
+                   aria-label="Explore Sweets">
+                    →
+                </a>
+
+            </div>
+        </div>
+
+
+        <!-- CAKES -->
+        <div class="category-card">
+
+            <img
+                src="PASTE_YOUR_ORIGINAL_CAKES_IMAGE_URL"
+                alt="Cakes"
+            >
+
+            <div class="category-info">
+
+                <h3>Cakes</h3>
+
+                <p>Make every celebration special.</p>
+
+                <a href="/cakes/"
+                   class="category-arrow"
+                   aria-label="Explore Cakes">
+                    →
+                </a>
+
+            </div>
+        </div>
+
+
+        <!-- NAMKEENS -->
+        <div class="category-card">
+
+            <img
+                src="PASTE_YOUR_ORIGINAL_NAMKEENS_IMAGE_URL"
+                alt="Namkeens"
+            >
+
+            <div class="category-info">
+
+                <h3>Namkeens</h3>
+
+                <p>Crunchy snacks for every moment.</p>
+
+                <a href="/namkeens/"
+                   class="category-arrow"
+                   aria-label="Explore Namkeens">
+                    →
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- BESTSELLERS SECTION -->
+
+<section class="section">
+
+    <div class="section-heading">
+
+        <p class="subtitle">CUSTOMER FAVOURITES</p>
+
+        <h2>Our Bestsellers</h2>
+
+        <p>Some treats are simply irresistible.</p>
+
+    </div>
+
+    <div class="product-grid">
+
+        <div class="product-card">
+
+            <img
+            src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600"
+            alt="Chocolate cake">
+
+            <div class="product-details">
+                <h3>Chocolate Cake</h3>
+                <p>Rich and delicious chocolate delight.</p>
+                <span class="price">₹450</span>
+            </div>
+
+        </div>
+
+
+        <div class="product-card">
+
+            <img
+            src="https://images.unsplash.com/photo-1550617931-e17a7b70dce2?w=600"
+            alt="Cupcakes">
+
+            <div class="product-details">
+                <h3>Vanilla Cupcakes</h3>
+                <p>Soft, fluffy and creamy cupcakes.</p>
+                <span class="price">₹180</span>
+            </div>
+
+        </div>
+
+
+        <div class="product-card">
+
+            <img
+            src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600"
+            alt="Cookies">
+
+            <div class="product-details">
+                <h3>Fresh Cookies</h3>
+                <p>Crunchy bites of happiness.</p>
+                <span class="price">₹150</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- SPECIAL OFFER -->
+
+<section class="offer">
+
+    <p>MADE WITH LOVE, SERVED WITH JOY</p>
+
+    <h2>Sweet Moments,<br>Special Prices!</h2>
+
+    <p>Discover something delicious for every occasion.</p>
+
+    <a href="#categories" class="offer-btn">
+        Explore Our Treats →
+    </a>
+
+</section>
+
+
+<!-- WHY CHOOSE US -->
+
+<section class="section">
+
+    <div class="section-heading">
+
+        <p class="subtitle">THE BANNITHINONNA PROMISE</p>
+
+        <h2>Why Choose Us?</h2>
+
+    </div>
+
+    <div class="feature-grid">
+
+        <div class="feature-card">
+            <div class="icon">🥐</div>
+            <h3>Freshly Made</h3>
+            <p>Fresh products prepared with care every day.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">❤️</div>
+            <h3>Made With Love</h3>
+            <p>Every treat is crafted with passion.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">🚚</div>
+            <h3>Fast Delivery</h3>
+            <p>Your favourite treats delivered to your doorstep.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">⭐</div>
+            <h3>Quality Ingredients</h3>
+            <p>We believe every bite should be special.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CUSTOMER TESTIMONIAL -->
+
+<section class="section testimonial">
+
+    <div class="section-heading">
+
+        <p class="subtitle">LOVE FROM OUR CUSTOMERS</p>
+
+        <h2>Sweet Words, Happy Hearts</h2>
+
+    </div>
+
+    <div class="review-box">
+
+        <div class="stars">★★★★★</div>
+
+        <p>
+            "Absolutely loved the taste and freshness!
+            Everything was beautifully prepared.
+            Definitely ordering again!"
+        </p>
+
+        <h3>Happy Customer</h3>
+
+    </div>
+
+</section>
+
+
+<!-- NEWSLETTER -->
+
+<section class="newsletter">
+
+    <h2>Get Sweet Updates!</h2>
+
+    <p>
+        Subscribe to hear about our latest treats
+        and special offers.
+    </p>
+
+    <form id="newsletterForm">
+
+        <input
+        type="email"
+        id="newsletterEmail"
+        placeholder="Enter your email address"
+        required>
+
+        <button type="submit">
+            Subscribe
+        </button>
+
+    </form>
+
+    <p id="newsletterMessage"></p>
+
+</section>
+
+
+<!-- JAVASCRIPT -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const form = document.getElementById("newsletterForm");
+
+    const message = document.getElementById("newsletterMessage");
+
+    form.addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+        message.textContent =
+            "Thank you for your interest in BanniThinonna!";
+
+        message.style.color = "green";
+
+        form.reset();
+
+    });
+
+});
+
+</script>
+
+{% endblock %}
