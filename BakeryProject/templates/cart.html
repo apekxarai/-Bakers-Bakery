@@ -46,7 +46,7 @@
     padding: 55px 15px;
 }
 
-.empty-cart .cart-icon {
+.cart-icon {
     font-size: 65px;
 }
 
@@ -69,6 +69,79 @@
     text-decoration: none;
 }
 
+.cart-product {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-product:last-child {
+    border-bottom: none;
+}
+
+.cart-product img {
+    width: 105px;
+    height: 105px;
+    min-width: 105px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.cart-product-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.cart-product-info h3 {
+    color: #5b3025;
+    margin-bottom: 7px;
+}
+
+.cart-product-info p {
+    color: #777;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.cart-item-price {
+    color: #8b4935 !important;
+    font-weight: bold;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.quantity-controls button {
+    width: 29px;
+    height: 29px;
+    border: 1px solid #8b4935;
+    background: white;
+    color: #8b4935;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 17px;
+}
+
+.quantity-controls span {
+    font-weight: bold;
+    color: #5b3025;
+}
+
+.remove-btn {
+    border: none;
+    background: none;
+    color: #b34b3e;
+    cursor: pointer;
+    margin-top: 9px;
+    font-size: 13px;
+}
+
 .cart-summary h2 {
     color: #5b3025;
     margin-bottom: 22px;
@@ -77,6 +150,7 @@
 .summary-row {
     display: flex;
     justify-content: space-between;
+    gap: 10px;
     margin: 15px 0;
     color: #666;
 }
@@ -100,12 +174,29 @@
     margin-top: 25px;
 }
 
+.checkout-btn:hover {
+    background: #70432f;
+}
+
 @media(max-width: 750px) {
     .cart-layout {
         grid-template-columns: 1fr;
     }
 }
+
+@media(max-width: 450px) {
+    .cart-product img {
+        width: 80px;
+        height: 85px;
+        min-width: 80px;
+    }
+
+    .cart-items, .cart-summary {
+        padding: 15px;
+    }
+}
 </style>
+
 
 <div class="cart-page">
 
@@ -116,38 +207,38 @@
 
     <div class="cart-layout">
 
+        <!-- CART PRODUCTS -->
+
         <div class="cart-items">
 
-            {% if cart_items %}
+            <div id="cartProducts"></div>
 
-                {% for item in cart_items %}
-                    <div class="cart-product">
-                        <!-- Product details will be connected to Django here -->
-                        {{ item.product.name }}
-                    </div>
-                {% endfor %}
-
-            {% else %}
-
-                <div class="empty-cart">
-                    <div class="cart-icon">🛒</div>
-                    <h2>Your cart is empty!</h2>
-                    <p>Looks like you haven't added any delicious treats yet.</p>
-                    <a href="{% url 'home' %}" class="shop-btn">
-                        Continue Shopping
-                    </a>
-                </div>
-
-            {% endif %}
+            <div class="empty-cart" id="emptyCart" style="display:none;">
+                <div class="cart-icon">🛒</div>
+                <h2>Your cart is empty!</h2>
+                <p>Looks like you haven't added any delicious treats yet.</p>
+                <a href="{% url 'sweets' %}" class="shop-btn">
+                    Explore Sweets
+                </a>
+            </div>
 
         </div>
 
+
+        <!-- ORDER SUMMARY -->
+
         <div class="cart-summary">
+
             <h2>Order Summary</h2>
 
             <div class="summary-row">
+                <span>Total Items</span>
+                <span id="totalItems">0</span>
+            </div>
+
+            <div class="summary-row">
                 <span>Subtotal</span>
-                <span>₹{{ total }}</span>
+                <span id="subtotal">₹0.00</span>
             </div>
 
             <div class="summary-row">
@@ -157,16 +248,252 @@
 
             <div class="summary-row summary-total">
                 <span>Total</span>
-                <span>₹{{ total }}</span>
+                <span id="grandTotal">₹0.00</span>
             </div>
 
-            <a href="#" class="checkout-btn">
+            <a href="#" class="checkout-btn" id="checkoutBtn">
                 Proceed to Checkout
             </a>
+
         </div>
 
     </div>
 
 </div>
+
+
+<script>
+
+// READ CART FROM LOCAL STORAGE
+
+function getCart() {
+    try {
+        return JSON.parse(localStorage.getItem("bakeryCart")) || [];
+    } catch (error) {
+        return [];
+    }
+}
+
+
+// SAVE CART
+
+function saveCart(cart) {
+    localStorage.setItem("bakeryCart", JSON.stringify(cart));
+}
+
+
+// DISPLAY CART
+
+function displayCart() {
+
+    let cart = getCart();
+
+    let container = document.getElementById("cartProducts");
+    let emptyCart = document.getElementById("emptyCart");
+
+    container.innerHTML = "";
+
+    if (cart.length === 0) {
+
+        emptyCart.style.display = "block";
+
+    } else {
+
+        emptyCart.style.display = "none";
+
+        cart.forEach((item, index) => {
+
+            let weight = Number(item.weight) || 1000;
+            let quantity = Number(item.quantity) || 1;
+            let price = Number(item.price) || 0;
+            let itemTotal = price * quantity;
+
+            let product = document.createElement("div");
+            product.className = "cart-product";
+
+            let image = document.createElement("img");
+            image.src = item.image || "";
+            image.alt = item.name || "Sweet";
+            image.onerror = function() {
+                this.style.display = "none";
+            };
+
+            let info = document.createElement("div");
+            info.className = "cart-product-info";
+
+            let name = document.createElement("h3");
+            name.textContent = item.name || "Product";
+
+            let weightText = document.createElement("p");
+            weightText.textContent =
+                "Weight: " + (weight >= 1000
+                    ? (weight / 1000) + " kg"
+                    : weight + " g");
+
+            let priceText = document.createElement("p");
+            priceText.className = "cart-item-price";
+            priceText.textContent = "₹" + price.toFixed(2);
+
+            let quantityControls = document.createElement("div");
+            quantityControls.className = "quantity-controls";
+
+            let decrease = document.createElement("button");
+            decrease.textContent = "−";
+            decrease.type = "button";
+            decrease.onclick = () => changeQuantity(index, -1);
+
+            let quantityValue = document.createElement("span");
+            quantityValue.textContent = quantity;
+
+            let increase = document.createElement("button");
+            increase.textContent = "+";
+            increase.type = "button";
+            increase.onclick = () => changeQuantity(index, 1);
+
+            quantityControls.append(decrease, quantityValue, increase);
+
+            let totalText = document.createElement("p");
+            totalText.className = "cart-item-price";
+            totalText.textContent = "Total: ₹" + itemTotal.toFixed(2);
+
+            let removeButton = document.createElement("button");
+            removeButton.className = "remove-btn";
+            removeButton.textContent = "Remove";
+            removeButton.type = "button";
+            removeButton.onclick = () => removeCartItem(index);
+
+            info.append(
+                name,
+                weightText,
+                priceText,
+                quantityControls,
+                totalText,
+                removeButton
+            );
+
+            product.append(image, info);
+            container.appendChild(product);
+
+        });
+
+    }
+
+    updateSummary(cart);
+    updateHeaderCounts();
+
+}
+
+
+// CHANGE QUANTITY
+
+function changeQuantity(index, change) {
+
+    let cart = getCart();
+
+    if (!cart[index]) return;
+
+    cart[index].quantity =
+        (Number(cart[index].quantity) || 1) + change;
+
+    if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+    }
+
+    saveCart(cart);
+    displayCart();
+
+}
+
+
+// REMOVE PRODUCT
+
+function removeCartItem(index) {
+
+    let cart = getCart();
+
+    cart.splice(index, 1);
+
+    saveCart(cart);
+    displayCart();
+
+}
+
+
+// UPDATE ORDER SUMMARY
+
+function updateSummary(cart) {
+
+    let subtotal = 0;
+    let totalItems = 0;
+
+    cart.forEach(item => {
+
+        let quantity = Number(item.quantity) || 1;
+        let price = Number(item.price) || 0;
+
+        subtotal += price * quantity;
+        totalItems += quantity;
+
+    });
+
+    document.getElementById("totalItems").textContent = totalItems;
+
+    document.getElementById("subtotal").textContent =
+        "₹" + subtotal.toFixed(2);
+
+    document.getElementById("grandTotal").textContent =
+        "₹" + subtotal.toFixed(2);
+
+}
+
+
+// HEADER COUNTS
+
+function updateHeaderCounts() {
+
+    let cart = getCart();
+
+    let wishlist = [];
+
+    try {
+        wishlist = JSON.parse(
+            localStorage.getItem("bakeryWishlist")
+        ) || [];
+    } catch (error) {
+        wishlist = [];
+    }
+
+    let cartCount = cart.reduce(
+        (total, item) => total + (Number(item.quantity) || 1), 0
+    );
+
+    let cartElement = document.getElementById("cartCount");
+    let wishlistElement = document.getElementById("wishlistCount");
+
+    if (cartElement) cartElement.textContent = cartCount;
+
+    if (wishlistElement) wishlistElement.textContent = wishlist.length;
+
+}
+
+
+// CHECKOUT PLACEHOLDER
+
+document.getElementById("checkoutBtn").addEventListener("click", function(event) {
+    event.preventDefault();
+
+    if (getCart().length === 0) {
+        alert("Your cart is empty!");
+    } else {
+        alert("Checkout will be available soon!");
+    }
+});
+
+
+// INITIAL DISPLAY
+
+document.addEventListener("DOMContentLoaded", displayCart);
+
+</script>
 
 {% endblock %}
